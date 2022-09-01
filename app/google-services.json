@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "10185549476",
+    "project_id": "bike-fall-detection",
+    "storage_bucket": "bike-fall-detection.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:10185549476:android:d156c49ae8c40663a56831",
+        "android_client_info": {
+          "package_name": "com.example.bikefalldetection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "10185549476-6vhs25f0m510vbbd7sspnkv7maja8j95.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhyRIdMLfzg6PkHDb7GsYHXTjC4QMjtr4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "10185549476-6vhs25f0m510vbbd7sspnkv7maja8j95.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
