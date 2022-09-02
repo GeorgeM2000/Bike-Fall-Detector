@@ -167,6 +167,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         });
     }
 
+
     private void sendHelpMessage(String message, String googleMapsAddress, SmsManager smsManager) {
         FirebaseDatabase.getInstance().getReference()
                 .child("Users")
