@@ -48,13 +48,10 @@ public class BikeFallDetectorService extends Service {
 
     private static final UUID fallServiceUUID = UUID.fromString("00005321-0000-1000-8000-00805f9b34fb");
     private static final UUID fallCharacteristicUUID = UUID.fromString("00000001-0000-1000-8000-00805f9b34fb");
-
     public BluetoothCentralManager central;
-
     //private final Context context;
     private final Handler handler = new Handler(Looper.getMainLooper());
     //private int currentTimeCounter = 0;
-
     private FusedLocationProviderClient fusedLocationClient;
     SharedPreferences contactPreferences;
 
@@ -94,7 +91,7 @@ public class BikeFallDetectorService extends Service {
                 int flags = parser.getIntValue(0x11);
                 if (flags == 1) {
                     // Send message
-                    sendMessage();
+                    sendHelpMessage();
                 }
             }
         }
@@ -216,7 +213,7 @@ public class BikeFallDetectorService extends Service {
         createNotificationChannel();
 
         Intent notificationIntent = new Intent(this, ControlDetection.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
         Notification notification = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             notification = new Notification.Builder(this, "BLE Service")
@@ -234,7 +231,7 @@ public class BikeFallDetectorService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void sendMessage() {
+    private void sendHelpMessage() {
 
         // No need to check for permissions
         @SuppressLint("MissingPermission") Task<Location> locationTask = fusedLocationClient.getLastLocation();
@@ -243,11 +240,13 @@ public class BikeFallDetectorService extends Service {
         locationTask.addOnSuccessListener(location -> {
             double latitude, longitude;
 
+            // Get user latitude and longitude
             latitude = location.getLatitude();
             longitude = location.getLongitude();
 
+            // Set the message and the google map address
             String message = "Βοήθεια! Συνέβει ατύχημα σε αυτή την τοποθεσία : " + latitude + " " + longitude;
-            String googleMapsAddress = "https://www.google.com/maps/search/?api=1&query=" + String.valueOf(latitude) + "%2C" + String.valueOf(longitude);
+            String googleMapsAddress = "https://www.google.com/maps/search/?api=1&query=" + latitude + "%2C" + longitude;
 
             // Load the contacts
             ArrayList<Contact> contacts = loadContacts();

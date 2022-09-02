@@ -9,7 +9,7 @@
     <!-- #C42556 #1E181C -->
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/seconds"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="112dp"
@@ -19,14 +19,14 @@
         android:textColor="#282828"
         android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/textView3"
+        app:layout_constraintEnd_toStartOf="@+id/dot"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/dot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="."
@@ -42,6 +42,7 @@
         tools:ignore="HardcodedText" />
 
     <TextView
+        android:id="@+id/milliseconds"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="112dp"
@@ -53,7 +54,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintStart_toEndOf="@+id/dot"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText" />
 
