@@ -57,8 +57,18 @@ public class Dashboard extends AppCompatActivity {
 
             // Get the User ID(UID)
             String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+
             // Sign out
             FirebaseAuth.getInstance().signOut();
+
+            SharedPreferences contactPreferences = getApplicationContext().getSharedPreferences("Contact_Preferences", Context.MODE_PRIVATE);
+            SharedPreferences.Editor contactEditor = contactPreferences.edit();
+
+            contactEditor.putString("Contacts", "");
+            contactEditor.apply();
+
+            startActivity(new Intent(Dashboard.this, MainActivity.class));
+            finish();
         });
 
 

@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,17 +18,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Contacts extends AppCompatActivity {
@@ -38,9 +31,7 @@ public class Contacts extends AppCompatActivity {
     ImageView imageViewEmpty;
     TextView textViewEmptyText;
     FloatingActionButton add_button;
-    ArrayList<String> person_full_names, person_phone_numbers;
     CustomAdapter customAdapter;
-    DatabaseReference databaseReference;
 
 
     @Override
@@ -68,8 +59,10 @@ public class Contacts extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()) {
+
                         DataSnapshot dataSnapshot = task.getResult();
                         if(dataSnapshot.hasChild("contacts")) {
+
                             FirebaseRecyclerOptions<Contact> options = new FirebaseRecyclerOptions.Builder<Contact>()
                                     .setQuery(FirebaseDatabase.getInstance().getReference()
                                             .child("Users")
@@ -80,24 +73,20 @@ public class Contacts extends AppCompatActivity {
                             customAdapter = new CustomAdapter(options, Contacts.this, Contacts.this);
                             recyclerView.setAdapter(customAdapter);
 
+                            // Don't show no data icon and text
                             imageViewEmpty.setVisibility(View.GONE);
                             textViewEmptyText.setVisibility(View.GONE);
                         } else {
+                            // Show no data icon and text
                             imageViewEmpty.setVisibility(View.VISIBLE);
                             textViewEmptyText.setVisibility(View.VISIBLE);
                         }
                     } else {
+                        // Show no data icon and text
                         imageViewEmpty.setVisibility(View.VISIBLE);
                         textViewEmptyText.setVisibility(View.VISIBLE);
                     }
                 });
-
-
-
-
-
-
-
     }
 
     @Override
@@ -122,23 +111,21 @@ public class Contacts extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Delete All?");
             builder.setMessage("Are you sure you want to delete all contacts?");
-            builder.setPositiveButton("Yes", (dialogInterface, i) -> {
-                FirebaseDatabase.getInstance().getReference()
-                        .child("Users")
-                        .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
-                        .child("contacts")
-                        .setValue(null)
-                        .addOnCompleteListener(task -> {
-                            if(task.isSuccessful()) {
-                                Toast.makeText(this, "All Data Has Been Deleted.", Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(Contacts.this, Contacts.class);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                Toast.makeText(this, "Delete Failed.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            });
+            builder.setPositiveButton("Yes", (dialogInterface, i) -> FirebaseDatabase.getInstance().getReference()
+                    .child("Users")
+                    .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                    .child("contacts")
+                    .setValue(null)
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()) {
+                            Toast.makeText(this, "All Data Has Been Deleted.", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(Contacts.this, Contacts.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(this, "Delete Failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    }));
             builder.setNegativeButton("No", (dialogInterface, i) -> Toast.makeText(Contacts.this, "Delete Cancelled.", Toast.LENGTH_LONG).show());
 
             builder.create().show();

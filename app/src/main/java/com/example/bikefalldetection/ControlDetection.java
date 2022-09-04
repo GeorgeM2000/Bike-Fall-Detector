@@ -8,6 +8,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -29,7 +30,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +50,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
     private int duration = 30;
     private CountDownTimer countDownTimer = null;
     private final long[] pattern = {0, 100, 1000};
+    private SharedPreferences contactPreferences;
 
 
     @SuppressLint("SetTextI18n")
@@ -72,6 +78,10 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
 
         // Vibrator
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        // Before the service starts, get the phone numbers from the firebase
+        // and store them in shared preferences.
+        getContacts();
 
         // When the user clicks the start service icon button
         start_service.setOnClickListener(view -> {
@@ -135,6 +145,51 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         });
     }
 
+    private ArrayList<com.example.bikefalldetection.Contact> loadContacts() {
+        contactPreferences = getApplicationContext().getSharedPreferences("Contact_Preferences", Context.MODE_PRIVATE);
+
+        Gson gson = new Gson();
+
+        String json = contactPreferences.getString("Contacts", "");
+
+        Type type = new TypeToken<ArrayList<com.example.bikefalldetection.Contact>>() {}.getType();
+
+        return gson.fromJson(json, type);
+    }
+
+    private void saveContacts(List<com.example.bikefalldetection.Contact> contacts) {
+        contactPreferences = getApplicationContext().getSharedPreferences("Contact_Preferences", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = contactPreferences.edit();
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(contacts);
+
+        editor.putString("Contacts", json);
+        editor.apply();
+    }
+
+    private void getContacts() {
+        FirebaseDatabase.getInstance().getReference()
+                .child("Users")
+                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                .child("contacts")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()) {
+                        List<com.example.bikefalldetection.Contact> contacts;
+                        GenericTypeIndicator<List<com.example.bikefalldetection.Contact>> t = new GenericTypeIndicator<List<com.example.bikefalldetection.Contact>>() {};
+                        contacts = task.getResult().getValue(t);
+
+                        // Save contacts
+                        saveContacts(contacts);
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Failed to retrieve contact information.", Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
     private void getUserLocation() {
 
         // Check for permissions
@@ -169,25 +224,13 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
 
 
     private void sendHelpMessage(String message, String googleMapsAddress, SmsManager smsManager) {
-        FirebaseDatabase.getInstance().getReference()
-                .child("Users")
-                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
-                .child("contacts")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()) {
-                        List<BikeFallDetectorService.Contact> contacts;
-                        GenericTypeIndicator<List<BikeFallDetectorService.Contact>> t = new GenericTypeIndicator<List<BikeFallDetectorService.Contact>>() {};
-                        contacts = task.getResult().getValue(t);
+        // Load contacts
+        ArrayList<Contact> contacts = loadContacts();
 
-                        for(BikeFallDetectorService.Contact contact: Objects.requireNonNull(contacts)) {
-                            smsManager.sendTextMessage(contact.getPhone_number(), null, message, null, null);
-                            smsManager.sendTextMessage(contact.getPhone_number(), null, googleMapsAddress, null, null);
-                        }
-                    } else {
-                        Toast.makeText(this, "Failed to retrieve contact information.", Toast.LENGTH_LONG).show();
-                    }
-                });
+        for(com.example.bikefalldetection.Contact contact: Objects.requireNonNull(contacts)) {
+            smsManager.sendTextMessage(contact.getPhone(), null, message, null, null);
+            smsManager.sendTextMessage(contact.getPhone(), null, googleMapsAddress, null, null);
+        }
     }
 
     private void startBLEService() {

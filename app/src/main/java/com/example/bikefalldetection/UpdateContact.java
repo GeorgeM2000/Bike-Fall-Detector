@@ -12,14 +12,13 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
 import java.util.Objects;
 
 public class UpdateContact extends AppCompatActivity {
 
     EditText editTextFullName, editTextPhone;
     Button update_button, delete_button;
-    String full_name, phone;
+    String full_name, phone, contact_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +40,13 @@ public class UpdateContact extends AppCompatActivity {
             actionBar.setTitle(full_name);
         }
 
-        // Update contact in database.
+        // When user clicks the update contact button.
         update_button.setOnClickListener(view -> {
             // Prepare update data.
-            HashMap<String, Object> update_user_info = new HashMap<String, Object>(){{
-                put("phone", editTextPhone);
-            }};
+            Contact contact = new Contact();
+            contact.setFull_name(editTextFullName.getText().toString());
+            contact.setPhone(editTextPhone.getText().toString());
+
 
 
             // Update data to database
@@ -54,8 +54,8 @@ public class UpdateContact extends AppCompatActivity {
                     .child("Users")
                     .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                     .child("contacts")
-                    .child(full_name)
-                    .setValue(update_user_info)
+                    .child(contact_id)
+                    .setValue(contact)
                     .addOnCompleteListener(task -> {
                         if(task.isSuccessful()) {
                             Toast.makeText(this, "Contact Updated.", Toast.LENGTH_SHORT).show();
@@ -66,16 +66,15 @@ public class UpdateContact extends AppCompatActivity {
         });
 
         // Delete contact in database.
-        delete_button.setOnClickListener(view -> {
-            deletePrompt();
-        });
+        delete_button.setOnClickListener(view -> deletePrompt());
 
     }
 
     public void getSetIndentData() {
-        if(getIntent().hasExtra("full_name") && getIntent().hasExtra("phone")) {
+        if(getIntent().hasExtra("full_name") && getIntent().hasExtra("phone") && getIntent().hasExtra("contact_id")) {
 
             // Get data from indent
+            contact_id = getIntent().getStringExtra("contact_id");
             full_name = getIntent().getStringExtra("full_name");
             phone = getIntent().getStringExtra("phone");
 
@@ -92,7 +91,7 @@ public class UpdateContact extends AppCompatActivity {
                 .child("Users")
                 .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .child("contacts")
-                .child(full_name)
+                .child(contact_id)
                 .setValue(null)
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()) {
@@ -108,9 +107,7 @@ public class UpdateContact extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delete " + full_name + "?");
         builder.setMessage("Are you sure you want to delete " + full_name + " contact?");
-        builder.setPositiveButton("Yes", (dialogInterface, i) -> {
-            deleteContact();
-        });
+        builder.setPositiveButton("Yes", (dialogInterface, i) -> deleteContact());
         builder.setNegativeButton("No", (dialogInterface, i) -> Toast.makeText(UpdateContact.this, "Delete Cancelled.", Toast.LENGTH_LONG).show());
 
         builder.create().show();

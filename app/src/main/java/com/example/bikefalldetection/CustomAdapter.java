@@ -41,6 +41,7 @@ public class CustomAdapter extends FirebaseRecyclerAdapter<Contact, CustomAdapte
 
             // Create a new intent and start a new activity.
             Intent intent = new Intent(context, UpdateContact.class);
+            intent.putExtra("contact_id", String.valueOf(position));
             intent.putExtra("full_name", String.valueOf(model.getFull_name()));
             intent.putExtra("phone", String.valueOf(model.getPhone()));
             activity.startActivityForResult(intent, 1);

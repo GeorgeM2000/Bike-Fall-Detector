@@ -56,16 +56,6 @@ public class BikeFallDetectorService extends Service {
     SharedPreferences contactPreferences;
 
 
-    // Class for Contact information
-    public static class Contact {
-        String phone_number;
-
-        public String getPhone_number() {
-            return phone_number;
-        }
-    }
-
-
     private final BluetoothPeripheralCallback peripheralCallback = new BluetoothPeripheralCallback() {
         @Override
         public void onServicesDiscovered(@NonNull BluetoothPeripheral peripheral) {
@@ -160,54 +150,20 @@ public class BikeFallDetectorService extends Service {
         handler.postDelayed(() -> central.scanForPeripheralsWithServices(new UUID[]{fallServiceUUID}), 2000);
     }
 
-    private void saveContacts(List<Contact> contacts) {
-        contactPreferences = getApplicationContext().getSharedPreferences("Route_Preferences", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = contactPreferences.edit();
-
-        Gson gson = new Gson();
-
-        String json = gson.toJson(contacts);
-
-        editor.putString("Contacts", json);
-        editor.apply();
-    }
-
     private ArrayList<Contact> loadContacts() {
+        contactPreferences = getApplicationContext().getSharedPreferences("Contact_Preferences", Context.MODE_PRIVATE);
+
         Gson gson = new Gson();
 
-        String json = contactPreferences.getString("Regions", "");
+        String json = contactPreferences.getString("Contacts", "");
 
         Type type = new TypeToken<ArrayList<Contact>>() {}.getType();
 
         return gson.fromJson(json, type);
     }
 
-    private void getPhoneNumbers() {
-        FirebaseDatabase.getInstance().getReference()
-                .child("Users")
-                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
-                .child("contacts")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()) {
-                        List<Contact> contacts;
-                        GenericTypeIndicator<List<Contact>> t = new GenericTypeIndicator<List<Contact>>() {};
-                        contacts = task.getResult().getValue(t);
-
-                        saveContacts(contacts);
-
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Failed to retrieve contact information.", Toast.LENGTH_LONG).show();
-                    }
-                });
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        // Before the service starts, get the phone numbers from the firebase
-        // and store them in shared preferences.
-        getPhoneNumbers();
 
         // Create a notification channel.
         createNotificationChannel();
@@ -253,8 +209,8 @@ public class BikeFallDetectorService extends Service {
 
             // Send a message to each contact
             for(Contact contact: contacts) {
-                smsManager.sendTextMessage(contact.getPhone_number(), null, message, null, null);
-                smsManager.sendTextMessage(contact.getPhone_number(), null, googleMapsAddress, null, null);
+                smsManager.sendTextMessage(contact.getPhone(), null, message, null, null);
+                smsManager.sendTextMessage(contact.getPhone(), null, googleMapsAddress, null, null);
             }
 
         });
