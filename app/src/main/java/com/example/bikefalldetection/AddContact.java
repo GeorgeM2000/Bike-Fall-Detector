@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -40,6 +41,7 @@ public class AddContact extends AppCompatActivity {
 
         // Initialize database reference.
         reference = FirebaseDatabase.getInstance().getReference()
+                .child("Users")
                 .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .child("contacts");
 
@@ -49,6 +51,7 @@ public class AddContact extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
                     children_count = snapshot.getChildrenCount();
+                    Log.i("GeorgeM2000", String.valueOf(children_count));
                 }
             }
 

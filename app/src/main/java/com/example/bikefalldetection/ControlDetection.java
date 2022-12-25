@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,7 +98,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
             // Start listening to accelerometer values.
             sensorManager.registerListener(ControlDetection.this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
-
+            Toast.makeText(this, "Service has started", Toast.LENGTH_SHORT).show();
         });
 
         // When the user clicks the stop service icon button
@@ -111,6 +112,8 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
 
             // Stop listening to accelerometer values
             sensorManager.unregisterListener(ControlDetection.this);
+
+            Toast.makeText(this, "Service has stopped", Toast.LENGTH_SHORT).show();
 
         });
 
@@ -133,6 +136,8 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
                 // Set seconds and milliseconds in text view back to 30 sec.
                 textViewSeconds.setText("30");
                 textViewMilliseconds.setText("00");
+
+                Toast.makeText(this, "Timer aborted", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Timer hasn't started", Toast.LENGTH_LONG).show();
             }
@@ -261,8 +266,11 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
                 Math.abs(sensorEvent.values[1] * sensorEvent.values[1]) +
                 Math.abs(sensorEvent.values[2] * sensorEvent.values[2]));
 
+
+
+        Log.i("GeorgeMLog", String.valueOf(alim));
         // If the linear acceleration variable(alim) exceeds a threshold.
-        if(alim > 200.0) {
+        if(alim > 20.0) {
 
             // Start timer
             if(countDownTimer == null) {
@@ -270,6 +278,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
                 // Start vibrating if the vibrator is available.
                 if(vibrator.hasVibrator()) {
                     vibrator.vibrate(pattern, 0);
+                    Log.i("GeorgeMLog", "Vibrator has started.");
                 }
 
                 countDownTimer = new CountDownTimer(duration * 1000L, 1000) {
@@ -306,7 +315,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
                         vibrator.cancel();
 
                         // Send help message
-                        getUserLocation();
+                        //getUserLocation();
 
                     }
                 }.start();

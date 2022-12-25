@@ -73,7 +73,9 @@ public class Contacts extends AppCompatActivity {
 
 
                             customAdapter = new CustomAdapter(options, Contacts.this, Contacts.this);
+                            customAdapter.startListening();
                             recyclerView.setAdapter(customAdapter);
+
 
                             // Don't show no data icon and text.
                             imageViewEmpty.setVisibility(View.GONE);
@@ -145,7 +147,6 @@ public class Contacts extends AppCompatActivity {
     @Override protected void onStart()
     {
         super.onStart();
-        customAdapter.startListening();
     }
 
     /*
@@ -155,6 +156,11 @@ public class Contacts extends AppCompatActivity {
     @Override protected void onStop()
     {
         super.onStop();
-        customAdapter.stopListening();
+    }
+
+    @Override protected void onDestroy()
+    {
+        super.onDestroy();
+        //customAdapter.stopListening();
     }
 }

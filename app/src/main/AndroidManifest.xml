@@ -12,6 +12,11 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-feature android:name="android.hardware.sensor.accelerometer" />
+    <uses-feature android:name="android.hardware.bluetooth" />
+    <uses-feature android:name="android.hardware.bluetooth_le" />
+    <uses-feature android:name="android.hardware.location.gps" />
+    <uses-feature android:name="android.hardware.location" />
 
     <application
         android:allowBackup="true"
@@ -53,7 +58,7 @@
             android:name=".Contacts"
             android:exported="false"
             android:label="Contacts"
-            android:theme="@style/Theme.BikeFallDetection" />
+            android:theme="@style/Theme.AppCompat.Light" />
         <activity
             android:name=".Login"
             android:exported="false"
