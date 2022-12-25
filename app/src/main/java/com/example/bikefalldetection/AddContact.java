@@ -31,19 +31,19 @@ public class AddContact extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_contact);
 
-        // Text Views
+        // Text Views.
         person_full_name = findViewById(R.id.full_name);
         person_phone_number = findViewById(R.id.phone_number);
 
-        // Button
+        // "AddContact" Button.
         buttonAddContact = findViewById(R.id.add_contact);
 
-        // Initialize database reference
+        // Initialize database reference.
         reference = FirebaseDatabase.getInstance().getReference()
                 .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .child("contacts");
 
-        // Set value event listener
+        // Set value event listener to get the number of contacts stored in the "contacts" field.
         valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -58,36 +58,35 @@ public class AddContact extends AppCompatActivity {
 
 
 
-        // Clear the text view when user clicks on it
+        // Clear the text view when user clicks on it.
         person_full_name.setOnClickListener(view -> person_full_name.getText().clear());
         person_phone_number.setOnClickListener(view -> person_phone_number.getText().clear());
 
         buttonAddContact.setOnClickListener(view -> {
 
-            // Get full name and phone number from text views
-            String full_name, phone;
-            full_name = String.valueOf(person_full_name.getText());
-            phone = String.valueOf(person_phone_number.getText()).replaceAll(" ", "");
+            // Get full name and phone number from text views.
+            String full_name = String.valueOf(person_full_name.getText());
+            String phone = String.valueOf(person_phone_number.getText()).replaceAll(" ", "");
 
+            // If the input fields are not empty.
             if(!full_name.equals("") && !phone.equals("")) {
 
-                // Create contact object
+                // Create contact object.
                 Contact contact = new Contact();
                 contact.setFull_name(full_name);
                 contact.setPhone(phone);
 
-                reference
-                        .child(String.valueOf(children_count))
+                reference.child(String.valueOf(children_count))
                         .setValue(contact)
                         .addOnCompleteListener(task -> {
                             if(task.isSuccessful()) {
-                                Toast.makeText(AddContact.this, "Contact Added.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddContact.this, "Contact added", Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(AddContact.this, "Failed To Add Contact", Toast.LENGTH_LONG).show();
+                                Toast.makeText(AddContact.this, "Failed to add contact", Toast.LENGTH_LONG).show();
                             }
                         });
             } else {
-                Toast.makeText(this, "Both Fields Must Be Filled.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Both fields must be filled", Toast.LENGTH_LONG).show();
             }
         });
     }

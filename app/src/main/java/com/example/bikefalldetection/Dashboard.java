@@ -35,14 +35,14 @@ public class Dashboard extends AppCompatActivity {
         cardSettings = findViewById(R.id.settings);
         cardLogout = findViewById(R.id.logout);
 
-        // When the user clicks the contacts icon
+        // When the user clicks the contacts icon, open the contacts page.
         cardContacts.setOnClickListener(view -> {
             Intent intent = new Intent(Dashboard.this, Contacts.class);
             startActivity(intent);
             finish();
         });
 
-        // When the user clicks the control center icon
+        // When the user clicks the control center icon, open the control center page.
         cardControlCenter.setOnClickListener(view -> {
             Intent intent = new Intent(Dashboard.this, ControlDetection.class);
             startActivity(intent);
@@ -50,10 +50,12 @@ public class Dashboard extends AppCompatActivity {
         });
 
 
-        // When the user clicks the logout icon
+        // When the user clicks the logout icon, logout the user.
         cardLogout.setOnClickListener(view -> {
             SharedPreferences userPreferences = getApplicationContext().getSharedPreferences("User_Preferences", Context.MODE_PRIVATE);
-            SharedPreferences routePreferences = getApplicationContext().getSharedPreferences("Route_Preferences", Context.MODE_PRIVATE);
+            SharedPreferences contactPreferences = getApplicationContext().getSharedPreferences("Contact_Preferences", Context.MODE_PRIVATE);
+            SharedPreferences.Editor contactEditor = contactPreferences.edit();
+            SharedPreferences.Editor userEditor = userPreferences.edit();
 
             // Get the User ID(UID)
             String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
@@ -61,11 +63,17 @@ public class Dashboard extends AppCompatActivity {
             // Sign out
             FirebaseAuth.getInstance().signOut();
 
-            SharedPreferences contactPreferences = getApplicationContext().getSharedPreferences("Contact_Preferences", Context.MODE_PRIVATE);
-            SharedPreferences.Editor contactEditor = contactPreferences.edit();
-
             contactEditor.putString("Contacts", "");
             contactEditor.apply();
+
+
+            // Set logged in status to true.
+            userEditor.putBoolean("Log_In_State", true);
+
+            // Store current time and date in shared preferences.
+            userEditor.putString("Log_In_Time", "");
+            userEditor.putString("Log_In_Date", "");
+            userEditor.apply();
 
             startActivity(new Intent(Dashboard.this, MainActivity.class));
             finish();

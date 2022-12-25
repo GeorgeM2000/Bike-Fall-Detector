@@ -41,29 +41,33 @@ public class SignUp extends AppCompatActivity {
         progressBar = findViewById(R.id.progress);
         mAuth = FirebaseAuth.getInstance();
 
+        // If user clicks on the login text, redirect him to the login page.
         textViewLogin.setOnClickListener(view -> {
             startActivity(new Intent(SignUp.this, Login.class));
             finish();
         });
 
+
+        // If the user clicks the sign up button.
         buttonSignUp.setOnClickListener(view -> {
-            // Get user information
+            // Get user information from text fields.
             String full_name, username, password, email;
             full_name = String.valueOf(textInputEditTextFullname.getText());
             username = String.valueOf(textInputEditTextUsername.getText()).replaceAll(" ", "");
             email = String.valueOf(textInputEditTextEmail.getText()).replaceAll(" ", "");
             password = String.valueOf(textInputEditTextPassword.getText());
 
-            // Check if all of the fields are filled
+            // Check if all of the fields are filled.
             if(!full_name.equals("") && !email.equals("") && !password.equals("") && !username.equals("")) {
-                // Start progressBar
+                // Start progressBar.
                 progressBar.setVisibility(View.VISIBLE);
 
-                // Create user
+                // Create user.
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(task -> {
 
-                            if(task.isSuccessful()) {
+                            // Add user information to the database.
+                            if(task.isSuccessful()) {   // If the process is successful.
                                 HashMap<String, Object> userData = new HashMap<String, Object>(){{
                                     put("email", email);
                                     put("full_name", full_name);
@@ -76,6 +80,7 @@ public class SignUp extends AppCompatActivity {
                                         .setValue(userData)
                                         .addOnCompleteListener(task1 -> {
                                             if(task1.isSuccessful()) {
+                                                // Redirect user to login page.
                                                 Toast.makeText(SignUp.this, "Sign up successful", Toast.LENGTH_SHORT).show();
                                                 startActivity(new Intent(SignUp.this, Login.class));
                                                 finish();
@@ -90,7 +95,7 @@ public class SignUp extends AppCompatActivity {
                             }
                         });
             } else {
-                Toast.makeText(SignUp.this, "All fields are required.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignUp.this, "All input fields are required.", Toast.LENGTH_SHORT).show();
             }
         });
     }

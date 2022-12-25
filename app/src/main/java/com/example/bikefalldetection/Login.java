@@ -36,32 +36,32 @@ public class Login extends AppCompatActivity {
         progressBar = findViewById(R.id.progress);
         mAuth = FirebaseAuth.getInstance();
 
-        // When user clicks the Sign Up text
+        // When user clicks the Sign Up text, redirect him to the login page.
         textViewSignUp.setOnClickListener(view -> {
             startActivity(new Intent(Login.this, SignUp.class));
             finish();
         });
 
-        // When user clicks the login button
+        // When user clicks the login button, start the login process.
         buttonLogin.setOnClickListener(view -> login());
     }
 
 
     private void login() {
 
-        // Get values
+        // Get values from input fields.
         String email = String.valueOf(textInputEditTextEmail.getText()).replaceAll(" ", "");
         String password = String.valueOf(textInputEditTextPassword.getText()).replaceAll(" ", "");
 
-        // Check if password and email fields are filled
+        // Check if password and email fields are filled.
         if(!email.equals("") && !password.equals("")) {
-            // Start progressBar first
+            // Start progressBar.
             progressBar.setVisibility(View.VISIBLE);
 
             // Sign in
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(Login.this, task -> {
-                if(task.isSuccessful()) {
-                    // Get current time and date
+                if(task.isSuccessful()) {   // If login is successful, change the login status.
+                    // Get current time and date.
                     String currentTime = null;
                     String currentDate = null;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -69,14 +69,13 @@ public class Login extends AppCompatActivity {
                         currentDate = LocalDate.now().toString();
                     }
 
-                    // If login is successful, change the login status
                     SharedPreferences userPreferences = getApplicationContext().getSharedPreferences("User_Preferences", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = userPreferences.edit();
 
-                    // Set logged in status to true
+                    // Set logged in status to true.
                     editor.putBoolean("Log_In_State", true);
 
-                    // Store current time in shared preferences
+                    // Store current time and date in shared preferences.
                     editor.putString("Log_In_Time", currentTime);
                     editor.putString("Log_In_Date", currentDate);
                     editor.apply();
@@ -89,7 +88,7 @@ public class Login extends AppCompatActivity {
                 }
             });
         } else {
-            Toast.makeText(Login.this, "All fields are required.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Login.this, "All input fields are required.", Toast.LENGTH_SHORT).show();
         }
     }
 

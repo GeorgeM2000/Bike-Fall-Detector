@@ -45,7 +45,7 @@ public class Contacts extends AppCompatActivity {
         textViewEmptyText = findViewById(R.id.no_data);
 
 
-        // When user clicks the "Add" button
+        // When user clicks the "Add" button, redirect the user to the AddContact page.
         add_button.setOnClickListener(view -> {
             Intent intent = new Intent(Contacts.this, AddContact.class);
             startActivity(intent);
@@ -61,6 +61,8 @@ public class Contacts extends AppCompatActivity {
                     if(task.isSuccessful()) {
 
                         DataSnapshot dataSnapshot = task.getResult();
+
+                        // If there is a "contacts" field in the user information, retrieve the "contacts" information.
                         if(dataSnapshot.hasChild("contacts")) {
 
                             FirebaseRecyclerOptions<Contact> options = new FirebaseRecyclerOptions.Builder<Contact>()
@@ -73,18 +75,20 @@ public class Contacts extends AppCompatActivity {
                             customAdapter = new CustomAdapter(options, Contacts.this, Contacts.this);
                             recyclerView.setAdapter(customAdapter);
 
-                            // Don't show no data icon and text
+                            // Don't show no data icon and text.
                             imageViewEmpty.setVisibility(View.GONE);
                             textViewEmptyText.setVisibility(View.GONE);
                         } else {
-                            // Show no data icon and text
+                            // Show no data icon and text.
                             imageViewEmpty.setVisibility(View.VISIBLE);
                             textViewEmptyText.setVisibility(View.VISIBLE);
                         }
                     } else {
-                        // Show no data icon and text
+                        // Show no data icon and text.
                         imageViewEmpty.setVisibility(View.VISIBLE);
                         textViewEmptyText.setVisibility(View.VISIBLE);
+
+                        Toast.makeText(this, "Contacts retrieval failed", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -118,15 +122,15 @@ public class Contacts extends AppCompatActivity {
                     .setValue(null)
                     .addOnCompleteListener(task -> {
                         if(task.isSuccessful()) {
-                            Toast.makeText(this, "All Data Has Been Deleted.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "All contacts have been deleted", Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(Contacts.this, Contacts.class);
                             startActivity(intent);
                             finish();
                         } else {
-                            Toast.makeText(this, "Delete Failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Deletion failed", Toast.LENGTH_SHORT).show();
                         }
                     }));
-            builder.setNegativeButton("No", (dialogInterface, i) -> Toast.makeText(Contacts.this, "Delete Cancelled.", Toast.LENGTH_LONG).show());
+            builder.setNegativeButton("No", (dialogInterface, i) -> Toast.makeText(Contacts.this, "Deletion cancelled.", Toast.LENGTH_LONG).show());
 
             builder.create().show();
 
@@ -134,16 +138,20 @@ public class Contacts extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // Function to tell the app to start getting
-    // data from database on starting of the activity
+    /*
+        Function to tell the app to start getting
+        data from database on starting of the activity.
+    */
     @Override protected void onStart()
     {
         super.onStart();
         customAdapter.startListening();
     }
 
-    // Function to tell the app to stop getting
-    // data from database on stopping of the activity
+    /*
+        Function to tell the app to stop getting
+        data from database on stopping of the activity.
+    */
     @Override protected void onStop()
     {
         super.onStop();
