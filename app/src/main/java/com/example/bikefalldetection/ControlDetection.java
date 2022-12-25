@@ -59,40 +59,42 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control_detection);
 
-        // Buttons
+        // Buttons.
         start_service = findViewById(R.id.start_service);
         stop_service = findViewById(R.id.stop_service);
         abort_timer = findViewById(R.id.abort_timer);
         send_help = findViewById(R.id.send_help);
 
-        // Fused location provider client
+        // Fused location provider client.
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Timer
+        // Timer.
         textViewSeconds = findViewById(R.id.seconds);
         textViewMilliseconds = findViewById(R.id.milliseconds);
 
-        // Sensor
+        // Sensor.
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 
-        // Vibrator
+        // Vibrator.
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-        // Before the service starts, get the phone numbers from the firebase
-        // and store them in shared preferences.
+        /*
+            Before the service starts, get the phone numbers from the firebase
+            and store them in shared preferences.
+        */
         getContacts();
 
         // When the user clicks the start service icon button
         start_service.setOnClickListener(view -> {
 
-            // Check for permissions
+            // Check for permissions.
             //ActivityCompat.requestPermissions(ControlDetection.this, permissions, 4);
 
-            // Start the service
+            // Start the service.
             //startBLEService();
 
-            // Start listening to accelerometer values
+            // Start listening to accelerometer values.
             sensorManager.registerListener(ControlDetection.this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
 
@@ -115,24 +117,24 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         // When the user clicks the abort timer icon button
         abort_timer.setOnClickListener(view -> {
 
-            // If the timer has started
+            // If the timer has started.
             if(countDownTimer != null) {
 
-                // Cancel the timer
+                // Cancel the timer.
                 countDownTimer.cancel();
                 countDownTimer = null;
 
-                // Cancel the vibrator
+                // Cancel the vibrator.
                 vibrator.cancel();
 
-                // Reset the duration to 30 sec
+                // Reset the duration to 30 sec.
                 duration = 30;
 
-                // Set seconds and milliseconds in text view back to 30 sec
+                // Set seconds and milliseconds in text view back to 30 sec.
                 textViewSeconds.setText("30");
                 textViewMilliseconds.setText("00");
             } else {
-                Toast.makeText(this, "Timer hasn't started.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Timer hasn't started", Toast.LENGTH_LONG).show();
             }
 
         });
@@ -224,7 +226,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
 
 
     private void sendHelpMessage(String message, String googleMapsAddress, SmsManager smsManager) {
-        // Load contacts
+        // Load contacts.
         ArrayList<Contact> contacts = loadContacts();
 
         for(com.example.bikefalldetection.Contact contact: Objects.requireNonNull(contacts)) {
@@ -265,7 +267,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
             // Start timer
             if(countDownTimer == null) {
 
-                // Start vibrating if the vibrator is available
+                // Start vibrating if the vibrator is available.
                 if(vibrator.hasVibrator()) {
                     vibrator.vibrate(pattern, 0);
                 }

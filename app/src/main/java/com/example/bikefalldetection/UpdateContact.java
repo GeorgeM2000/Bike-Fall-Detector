@@ -25,13 +25,16 @@ public class UpdateContact extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_contact);
 
+        // Text fields.
         editTextFullName = findViewById(R.id.full_name_u);
         editTextPhone = findViewById(R.id.phone_number_u);
+
+        // Update and delete buttons.
         update_button = findViewById(R.id.update);
         delete_button = findViewById(R.id.delete);
 
 
-        // Get data from indent and set the data to EditText fields.
+        // Get data from indent and set the data to text fields.
         getSetIndentData();
 
         // Set action bar title.
@@ -47,9 +50,7 @@ public class UpdateContact extends AppCompatActivity {
             contact.setFull_name(editTextFullName.getText().toString());
             contact.setPhone(editTextPhone.getText().toString());
 
-
-
-            // Update data to database
+            // Update data to database.
             FirebaseDatabase.getInstance().getReference()
                     .child("Users")
                     .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
@@ -58,9 +59,9 @@ public class UpdateContact extends AppCompatActivity {
                     .setValue(contact)
                     .addOnCompleteListener(task -> {
                         if(task.isSuccessful()) {
-                            Toast.makeText(this, "Contact Updated.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Contact updated.", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(this, "Update Failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Update failed.", Toast.LENGTH_SHORT).show();
                         }
                     });
         });
@@ -73,16 +74,16 @@ public class UpdateContact extends AppCompatActivity {
     public void getSetIndentData() {
         if(getIntent().hasExtra("full_name") && getIntent().hasExtra("phone") && getIntent().hasExtra("contact_id")) {
 
-            // Get data from indent
+            // Get data from indent.
             contact_id = getIntent().getStringExtra("contact_id");
             full_name = getIntent().getStringExtra("full_name");
             phone = getIntent().getStringExtra("phone");
 
-            // Set data to fields
+            // Set data to text fields.
             editTextFullName.setText(full_name);
             editTextPhone.setText(phone);
         } else {
-            Toast.makeText(this, "No Data.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No data", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -95,10 +96,10 @@ public class UpdateContact extends AppCompatActivity {
                 .setValue(null)
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()) {
-                        Toast.makeText(this, "Contact Deleted.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Contact deleted", Toast.LENGTH_SHORT).show();
                         finish();
                     } else {
-                        Toast.makeText(this, "Failed To Delete Contact.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Failed to delete contact", Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -108,7 +109,7 @@ public class UpdateContact extends AppCompatActivity {
         builder.setTitle("Delete " + full_name + "?");
         builder.setMessage("Are you sure you want to delete " + full_name + " contact?");
         builder.setPositiveButton("Yes", (dialogInterface, i) -> deleteContact());
-        builder.setNegativeButton("No", (dialogInterface, i) -> Toast.makeText(UpdateContact.this, "Delete Cancelled.", Toast.LENGTH_LONG).show());
+        builder.setNegativeButton("No", (dialogInterface, i) -> Toast.makeText(UpdateContact.this, "Delete cancelled.", Toast.LENGTH_LONG).show());
 
         builder.create().show();
     }
