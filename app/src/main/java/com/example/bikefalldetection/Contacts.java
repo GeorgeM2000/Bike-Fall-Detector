@@ -140,27 +140,22 @@ public class Contacts extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /*
-        Function to tell the app to start getting
-        data from database on starting of the activity.
-    */
+
     @Override protected void onStart()
     {
         super.onStart();
     }
 
-    /*
-        Function to tell the app to stop getting
-        data from database on stopping of the activity.
-    */
-    @Override protected void onStop()
-    {
-        super.onStop();
-    }
 
     @Override protected void onDestroy()
     {
         super.onDestroy();
-        //customAdapter.stopListening();
+    }
+
+    @Override public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(Contacts.this, Dashboard.class);
+        startActivity(intent);
+        finish();
     }
 }

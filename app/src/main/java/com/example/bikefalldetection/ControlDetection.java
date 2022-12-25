@@ -93,7 +93,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
             //ActivityCompat.requestPermissions(ControlDetection.this, permissions, 4);
 
             // Start the service.
-            //startBLEService();
+            startBLEService();
 
             // Start listening to accelerometer values.
             sensorManager.registerListener(ControlDetection.this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
@@ -108,7 +108,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
             //ActivityCompat.requestPermissions(ControlDetection.this, permissions, 4);
 
             // Stop service
-            //stopBLEService();
+            stopBLEService();
 
             // Stop listening to accelerometer values
             sensorManager.unregisterListener(ControlDetection.this);
@@ -315,7 +315,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
                         vibrator.cancel();
 
                         // Send help message
-                        //getUserLocation();
+                        getUserLocation();
 
                     }
                 }.start();
@@ -326,4 +326,11 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {}
+
+    @Override public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(ControlDetection.this, Dashboard.class);
+        startActivity(intent);
+        finish();
+    }
 }
