@@ -11,6 +11,7 @@ import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
@@ -176,6 +177,8 @@ public class BikeFallDetectorService extends Service {
                     .setContentTitle("BLE Bike Fall Detection")
                     .setContentText("In case of an accident the app will alert all selected people.")
                     .setContentIntent(pendingIntent)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.mipmap.ic_launcher))
                     .build();
         }
 

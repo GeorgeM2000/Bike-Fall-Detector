@@ -327,6 +327,9 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {}
 
+    /*
+    Redirect the user back to the Dashboard page when the back touch button is pressed.
+     */
     @Override public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(ControlDetection.this, Dashboard.class);

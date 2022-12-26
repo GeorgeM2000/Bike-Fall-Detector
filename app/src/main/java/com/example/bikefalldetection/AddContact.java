@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,8 +25,7 @@ public class AddContact extends AppCompatActivity {
 
     EditText person_full_name, person_phone_number;
     Button buttonAddContact;
-    DatabaseReference reference;
-    ValueEventListener valueEventListener;
+    DatabaseReference databaseReference;
     long children_count;
 
     @Override
@@ -40,25 +41,10 @@ public class AddContact extends AppCompatActivity {
         buttonAddContact = findViewById(R.id.add_contact);
 
         // Initialize database reference.
-        reference = FirebaseDatabase.getInstance().getReference()
+        databaseReference = FirebaseDatabase.getInstance().getReference()
                 .child("Users")
                 .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .child("contacts");
-
-        // Set value event listener to get the number of contacts stored in the "contacts" field.
-        valueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) {
-                    children_count = snapshot.getChildrenCount();
-                    Log.i("GeorgeM2000", String.valueOf(children_count));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        };
-
 
 
         // Clear the text view when user clicks on it.
@@ -79,7 +65,28 @@ public class AddContact extends AppCompatActivity {
                 contact.setFull_name(full_name);
                 contact.setPhone(phone);
 
-                reference.child(String.valueOf(children_count))
+                databaseReference.get().addOnCompleteListener(task -> {
+                    DataSnapshot dataSnapshot = task.getResult();
+                    if(dataSnapshot.exists()) {
+                        children_count = dataSnapshot.getChildrenCount();
+
+                        dataSnapshot.getRef().child(String.valueOf(children_count))
+                                .setValue(contact)
+                                .addOnCompleteListener(task1 -> {
+                                    if(task1.isSuccessful()) {
+                                        Toast.makeText(AddContact.this, "Contact added", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(AddContact.this, "Failed to add contact", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(AddContact.this, "Failed to add contact", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
+
+                databaseReference.child(String.valueOf(children_count))
                         .setValue(contact)
                         .addOnCompleteListener(task -> {
                             if(task.isSuccessful()) {
@@ -94,22 +101,4 @@ public class AddContact extends AppCompatActivity {
         });
     }
 
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        reference.removeEventListener(valueEventListener);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        reference.removeEventListener(valueEventListener);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        reference.addValueEventListener(valueEventListener);
-    }
 }

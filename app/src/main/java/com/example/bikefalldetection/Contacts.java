@@ -152,6 +152,10 @@ public class Contacts extends AppCompatActivity {
         super.onDestroy();
     }
 
+
+    /*
+    Redirect the user back to the Dashboard page when the back touch button is pressed.
+     */
     @Override public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(Contacts.this, Dashboard.class);
