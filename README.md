@@ -1,4 +1,4 @@
-![My_Remote_Image](https://drive.google.com/file/d/1jrs8-iPYPX0xsiIfCZBo4LFnOjTLmzXp/view?usp=sharing)
+<img src="https://drive.google.com/uc?id=1jrs8-iPYPX0xsiIfCZBo4LFnOjTLmzXp" alt="" width="230" height="230" title="Εφαρμογή ανίχνευσης πτώσης">
 <h1>Εφαρμογή ανίχνευσης πτώσης</h1>
 
 Εφαρμογή ανίχνευσης πτώσης/ατυχημάτων για ποδήλατα και μηχανές για τον 4ο Μαθητικό και Φοιτητικό Διαγωνισμό Προγραμματισμού, με θέμα «Κοζάνη 2030: Στον δρόμο για την κλιματική ουδετερότητα». Η εφαρμογή αφορά τον τομέα της ασφάλειας σε μία έξυπνη πόλη εστιάζοντας το ενδιαφέρον της στην ασφάλεια όλων των ηλικιακών ομάδων και ειδικότερα αυτών που βρίσκονται σε υψηλό κίνδυνο.
@@ -12,9 +12,8 @@
 
 Ένα ατύχημα ανιχνεύεται χρησιμοποιώντας την πλακέτα Arduino Nano 33 BLE(Bluetooth Low Energy) Sense τοποθετημένη επάνω σε ένα shield συνδεόμενη με μία μπαταρία 9V. 
 
-<img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fgrobotronics.com%2Farduino-nano-33-ble-with-headers-abx00034.html%3Fsl%3Den&psig=AOvVaw3dRn280Sd9wZxLljnZ4GJf&ust=1676550470316000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCPDhkKzDl_0CFQAAAAAdAAAAABAJ" alt="" title="Arduino Nano 33 ble Sense Shield">
-
-<img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.rapidonline.com%2Farduino-akx00028-tiny-machine-learning-kit-78-4851&psig=AOvVaw3dRn280Sd9wZxLljnZ4GJf&ust=1676550470316000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCPDhkKzDl_0CFQAAAAAdAAAAABAR" alt="" title="Arduino Nano 33 ble Sense Shield"
+<img src="https://drive.google.com/uc?id=1Ci5SUzHxW-uHdfvAojjIX6mlpYSU8qWH" alt="" width="543" height="250" title="Arduino Nano 33 ble Sense">                                                                                         
+<img src="https://drive.google.com/uc?id=10O5-KpwNs_aifo53T_lEOUztyEHoAKPx" alt="" width="543" height="543" title="Arduino Nano 33 ble Sense Shield">
 
 Τοποθετείται με κατάλληλο τρόπο στην μηχανή η στο ποδήλατο έτσι ώστε αν γέρνει αρκετά προς τα αριστερά η δεξία να στέλνει ένα BLE σήμα στην εφαρμογή. Το σήμα θα στέλνεται μέτα το πέρας 30 δευτερολέπτων. Πρίν σταλεί το σήμα, ο χρήστης θα έχει την δυνατότητα να ακυρώσει την χρονομέτρηση κουνώντας το χέρι του/της κοντά στον αισθητήρα χειρονομιών η τοποθετώντας την μηχανή η το ποδήλατο σε μία κατάσταση ισσοροποίας. 
 
