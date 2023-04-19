@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.bikefalldetection">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -10,7 +9,7 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <uses-feature android:name="android.hardware.sensor.accelerometer" />
@@ -30,20 +29,30 @@
         android:theme="@style/Theme.BikeFallDetection"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".Settings"
+            android:exported="false"
+            android:parentActivityName=".Dashboard"
+            android:theme="@style/Theme.AppCompat.Light">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
         <service
             android:name=".BikeFallDetectorService"
             android:enabled="true"
-            android:foregroundServiceType="location"
             android:exported="true"
+            android:foregroundServiceType="location"
             android:permission="TODO"
             tools:ignore="ExportedService" />
 
         <activity
             android:name=".ControlDetection"
             android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:label="Detection Control"
             android:parentActivityName=".Dashboard"
-            android:label="Detection Control"/>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".UpdateContact"
             android:exported="false"
@@ -59,6 +68,7 @@
             android:name=".Contacts"
             android:exported="false"
             android:label="Contacts"
+            android:parentActivityName=".Dashboard"
             android:theme="@style/Theme.AppCompat.Light" />
         <activity
             android:name=".Login"
@@ -67,6 +77,7 @@
         <activity
             android:name=".Dashboard"
             android:exported="false"
+            android:label="Dashboard"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".SignUp"

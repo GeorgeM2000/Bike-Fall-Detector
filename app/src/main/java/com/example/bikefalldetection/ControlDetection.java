@@ -3,6 +3,7 @@ package com.example.bikefalldetection;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -38,6 +39,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 public class ControlDetection extends AppCompatActivity implements SensorEventListener {
@@ -47,11 +49,15 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
     private FusedLocationProviderClient fusedLocationClient;
     private SensorManager sensorManager;
     private Vibrator vibrator;
-    private Sensor accelerometer;
+    private Sensor accelerometer, linearAccelerometer;
     private int duration = 30;
     private CountDownTimer countDownTimer = null;
     private final long[] pattern = {0, 100, 1000};
     private SharedPreferences contactPreferences;
+    private SharedPreferences settingsPreferences;
+    private Boolean detectionMethod;
+    private static final int coordinatesStackSize = 20;
+    private final Stack<Double[]> coordinatesStack = new FixedStack<>(coordinatesStackSize);
 
 
     @SuppressLint("SetTextI18n")
@@ -75,7 +81,8 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
 
         // Sensor.
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        linearAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         // Vibrator.
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -92,11 +99,23 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
             // Check for permissions.
             //ActivityCompat.requestPermissions(ControlDetection.this, permissions, 4);
 
-            // Start the service.
-            startBLEService();
+            // Get the settings value.
+            settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            detectionMethod = settingsPreferences.getBoolean("mobile_phone_detection", false);
 
-            // Start listening to accelerometer values.
-            sensorManager.registerListener(ControlDetection.this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+            // If the user has chosen to disable the "mobile phone detection" function...
+            if (!detectionMethod) {
+                // Start the service.
+                startBLEService();
+
+                // Start listening to accelerometer values.
+                sensorManager.registerListener(ControlDetection.this, linearAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+            }
+            // If the user has chosen to enable the "mobile phone detection" function...
+            else {
+                // Start listening to accelerometer values.
+                sensorManager.registerListener(ControlDetection.this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+            }
 
             Toast.makeText(this, "Service has started", Toast.LENGTH_SHORT).show();
         });
@@ -121,7 +140,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         abort_timer.setOnClickListener(view -> {
 
             // If the timer has started.
-            if(countDownTimer != null) {
+            if (countDownTimer != null) {
 
                 // Cancel the timer.
                 countDownTimer.cancel();
@@ -148,7 +167,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         send_help.setOnClickListener(view -> {
 
             // Get user location and send help message
-            getUserLocation();
+            sendHelpMessage();
         });
     }
 
@@ -159,7 +178,8 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
 
         String json = contactPreferences.getString("Contacts", "");
 
-        Type type = new TypeToken<ArrayList<com.example.bikefalldetection.Contact>>() {}.getType();
+        Type type = new TypeToken<ArrayList<com.example.bikefalldetection.Contact>>() {
+        }.getType();
 
         return gson.fromJson(json, type);
     }
@@ -183,9 +203,10 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
                 .child("contacts")
                 .get()
                 .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()) {
+                    if (task.isSuccessful()) {
                         List<com.example.bikefalldetection.Contact> contacts;
-                        GenericTypeIndicator<List<com.example.bikefalldetection.Contact>> t = new GenericTypeIndicator<List<com.example.bikefalldetection.Contact>>() {};
+                        GenericTypeIndicator<List<com.example.bikefalldetection.Contact>> t = new GenericTypeIndicator<List<com.example.bikefalldetection.Contact>>() {
+                        };
                         contacts = task.getResult().getValue(t);
 
                         // Save contacts
@@ -197,9 +218,24 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
                 });
     }
 
-    private void getUserLocation() {
+    private  void sendHelpMessage() {
+        SmsManager smsManager = SmsManager.getDefault();
 
-        // Check for permissions
+        // Set the message and the google map address
+        String message = "Βοήθεια! Συνέβει ατύχημα σε αυτή την τοποθεσία : " + coordinatesStack.get(coordinatesStack.size() - 1)[0] + " " + coordinatesStack.get(coordinatesStack.size() - 1)[1];
+        String googleMapsAddress = "https://www.google.com/maps/search/?api=1&query=" + coordinatesStack.get(coordinatesStack.size() - 1)[0] + "%2C" + coordinatesStack.get(coordinatesStack.size() - 1)[1];
+
+        // Load contacts.
+        ArrayList<Contact> contacts = loadContacts();
+
+        for (com.example.bikefalldetection.Contact contact : Objects.requireNonNull(contacts)) {
+            smsManager.sendTextMessage(contact.getPhone(), null, message, null, null);
+            smsManager.sendTextMessage(contact.getPhone(), null, googleMapsAddress, null, null);
+        }
+    }
+
+    private void storeUsersCoordinates() {
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -212,32 +248,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         }
         Task<Location> locationTask = fusedLocationClient.getLastLocation();
 
-        SmsManager smsManager = SmsManager.getDefault();
-        locationTask.addOnSuccessListener(location -> {
-            double latitude, longitude;
-
-            // Get user latitude and longitude
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-
-            // Set the message and the google map address
-            String message = "Βοήθεια! Συνέβει ατύχημα σε αυτή την τοποθεσία : " + latitude + " " + longitude;
-            String googleMapsAddress = "https://www.google.com/maps/search/?api=1&query=" + latitude + "%2C" + longitude;
-
-            // Send help message
-            sendHelpMessage(message, googleMapsAddress, smsManager);
-        });
-    }
-
-
-    private void sendHelpMessage(String message, String googleMapsAddress, SmsManager smsManager) {
-        // Load contacts.
-        ArrayList<Contact> contacts = loadContacts();
-
-        for(com.example.bikefalldetection.Contact contact: Objects.requireNonNull(contacts)) {
-            smsManager.sendTextMessage(contact.getPhone(), null, message, null, null);
-            smsManager.sendTextMessage(contact.getPhone(), null, googleMapsAddress, null, null);
-        }
+        locationTask.addOnSuccessListener(location -> coordinatesStack.push(new Double[]{location.getLatitude(), location.getLongitude()}));
     }
 
     private void startBLEService() {
@@ -260,68 +271,144 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        double alim = Math.sqrt(Math.abs(sensorEvent.values[0] * sensorEvent.values[0]) +
-                Math.abs(sensorEvent.values[1] * sensorEvent.values[1]) +
-                Math.abs(sensorEvent.values[2] * sensorEvent.values[2]));
+
+        // Get user coordinates and store them in a stack of fixed size.
+        storeUsersCoordinates();
+        
+        if(!detectionMethod) {
+            double alim = Math.sqrt(Math.abs(sensorEvent.values[0] * sensorEvent.values[0]) +
+                    Math.abs(sensorEvent.values[1] * sensorEvent.values[1]) +
+                    Math.abs(sensorEvent.values[2] * sensorEvent.values[2]));
+
+            // If the linear acceleration variable(alim) exceeds a threshold.
+            if(alim > 20.0) {
+
+                // Start timer
+                if(countDownTimer == null) {
+
+                    // Start vibrating if the vibrator is available.
+                    if(vibrator.hasVibrator()) {
+                        vibrator.vibrate(pattern, 0);
+                        Log.i("GeorgeMLog", "Vibrator has started.");
+                    }
+
+                    countDownTimer = new CountDownTimer(duration * 1000L, 1000) {
+                        @Override
+                        public void onTick(long l) {
+                            runOnUiThread(() -> {
 
 
+                                @SuppressLint("DefaultLocale") String time = String.format("%02d:%02d", TimeUnit.MILLISECONDS.toSeconds(l) -
+                                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(l)),
+                                        TimeUnit.MILLISECONDS.toMillis(l) -
+                                                TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(l)));
 
-        Log.i("GeorgeMLog", String.valueOf(alim));
-        // If the linear acceleration variable(alim) exceeds a threshold.
-        if(alim > 20.0) {
 
-            // Start timer
-            if(countDownTimer == null) {
+                                final String[] seconds_milliseconds = time.split(":");
 
-                // Start vibrating if the vibrator is available.
-                if(vibrator.hasVibrator()) {
-                    vibrator.vibrate(pattern, 0);
-                    Log.i("GeorgeMLog", "Vibrator has started.");
+                                textViewSeconds.setText(seconds_milliseconds[0]);
+                                textViewMilliseconds.setText(seconds_milliseconds[1]);
+
+                            });
+                        }
+
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onFinish() {
+                            // Reset the duration to 30 sec
+                            duration = 30;
+
+                            // Set seconds and milliseconds in text view back to 30 sec
+                            textViewSeconds.setText("30");
+                            textViewMilliseconds.setText("00");
+
+                            // Stop vibrating
+                            vibrator.cancel();
+
+                            // Send help message
+                            sendHelpMessage();
+
+                        }
+                    }.start();
+                }
+            }
+        } else {
+            // If the linear acceleration variable(alim) exceeds a threshold.
+            if(sensorEvent.values[0] > 5.0) {
+
+                // Start timer
+                if(countDownTimer == null) {
+
+                    // Start vibrating if the vibrator is available.
+                    if(vibrator.hasVibrator()) {
+                        vibrator.vibrate(pattern, 0);
+                        Log.i("GeorgeMLog", "Vibrator has started.");
+                    }
+
+                    countDownTimer = new CountDownTimer(duration * 1000L, 1000) {
+                        @Override
+                        public void onTick(long l) {
+                            runOnUiThread(() -> {
+
+                                @SuppressLint("DefaultLocale") String time = String.format("%02d:%02d", TimeUnit.MILLISECONDS.toSeconds(l) -
+                                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(l)),
+                                        TimeUnit.MILLISECONDS.toMillis(l) -
+                                                TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(l)));
+
+                                final String[] seconds_milliseconds = time.split(":");
+
+                                textViewSeconds.setText(seconds_milliseconds[0]);
+                                textViewMilliseconds.setText(seconds_milliseconds[1]);
+
+                            });
+                        }
+
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onFinish() {
+                            // Reset the duration to 30 sec
+                            duration = 30;
+
+                            // Set seconds and milliseconds in text view back to 30 sec
+                            textViewSeconds.setText("30");
+                            textViewMilliseconds.setText("00");
+
+                            // Stop vibrating
+                            vibrator.cancel();
+
+                            // Send help message
+                            sendHelpMessage();
+
+                        }
+                    }.start();
+                }
+            } else {
+
+                // If the timer has started.
+                if (countDownTimer != null) {
+
+                    // Cancel the timer.
+                    countDownTimer.cancel();
+                    countDownTimer = null;
+
+                    // Cancel the vibrator.
+                    vibrator.cancel();
+
+                    // Reset the duration to 30 sec.
+                    duration = 30;
+
+                    // Set seconds and milliseconds in text view back to 30 sec.
+                    textViewSeconds.setText("30");
+                    textViewMilliseconds.setText("00");
                 }
 
-                countDownTimer = new CountDownTimer(duration * 1000L, 1000) {
-                    @Override
-                    public void onTick(long l) {
-                        runOnUiThread(() -> {
-
-
-                            @SuppressLint("DefaultLocale") String time = String.format("%02d:%02d", TimeUnit.MILLISECONDS.toSeconds(l) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(l)),
-                                    TimeUnit.MILLISECONDS.toMillis(l) -
-                                    TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(l)));
-
-
-                            final String[] seconds_milliseconds = time.split(":");
-
-                            textViewSeconds.setText(seconds_milliseconds[0]);
-                            textViewMilliseconds.setText(seconds_milliseconds[1]);
-
-                        });
-                    }
-
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onFinish() {
-                        // Reset the duration to 30 sec
-                        duration = 30;
-
-                        // Set seconds and milliseconds in text view back to 30 sec
-                        textViewSeconds.setText("30");
-                        textViewMilliseconds.setText("00");
-
-                        // Stop vibrating
-                        vibrator.cancel();
-
-                        // Send help message
-                        getUserLocation();
-
-                    }
-                }.start();
             }
 
         }
+
     }
 
     @Override

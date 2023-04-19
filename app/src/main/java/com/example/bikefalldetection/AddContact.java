@@ -46,11 +46,6 @@ public class AddContact extends AppCompatActivity {
                 .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .child("contacts");
 
-
-        // Clear the text view when user clicks on it.
-        person_full_name.setOnClickListener(view -> person_full_name.getText().clear());
-        person_phone_number.setOnClickListener(view -> person_phone_number.getText().clear());
-
         buttonAddContact.setOnClickListener(view -> {
 
             // Get full name and phone number from text views.
@@ -79,22 +74,20 @@ public class AddContact extends AppCompatActivity {
                                         Toast.makeText(AddContact.this, "Failed to add contact", Toast.LENGTH_LONG).show();
                                     }
                                 });
+                    } else if(!dataSnapshot.exists()) {
+                        dataSnapshot.getRef().child("0")
+                                .setValue(contact)
+                                .addOnCompleteListener(task1 -> {
+                                    if(task1.isSuccessful()) {
+                                        Toast.makeText(AddContact.this, "Contact added", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(AddContact.this, "Failed to add contact", Toast.LENGTH_LONG).show();
+                                    }
+                                });
                     } else {
                         Toast.makeText(AddContact.this, "Failed to add contact", Toast.LENGTH_LONG).show();
                     }
                 });
-
-
-
-                databaseReference.child(String.valueOf(children_count))
-                        .setValue(contact)
-                        .addOnCompleteListener(task -> {
-                            if(task.isSuccessful()) {
-                                Toast.makeText(AddContact.this, "Contact added", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(AddContact.this, "Failed to add contact", Toast.LENGTH_LONG).show();
-                            }
-                        });
             } else {
                 Toast.makeText(this, "Both fields must be filled", Toast.LENGTH_LONG).show();
             }

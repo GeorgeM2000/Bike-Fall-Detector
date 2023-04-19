@@ -18,6 +18,6 @@
     <string name="todo">TODO</string>
     <string name="name">Name</string>
     <string name="phone">Phone</string>
-    <string name="person_name">Person name</string>
-    <string name="person_phone_number">Person Phone Number</string>
+    <string name="person_name">Full Name</string>
+    <string name="phone_number">Phone Number</string>
 </resources>

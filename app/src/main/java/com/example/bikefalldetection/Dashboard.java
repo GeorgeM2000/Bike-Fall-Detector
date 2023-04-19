@@ -39,14 +39,18 @@ public class Dashboard extends AppCompatActivity {
         cardContacts.setOnClickListener(view -> {
             Intent intent = new Intent(Dashboard.this, Contacts.class);
             startActivity(intent);
-            finish();
+
         });
 
         // When the user clicks the control center icon, open the control center page.
         cardControlCenter.setOnClickListener(view -> {
             Intent intent = new Intent(Dashboard.this, ControlDetection.class);
             startActivity(intent);
-            finish();
+        });
+
+        cardSettings.setOnClickListener(view -> {
+            Intent intent = new Intent(Dashboard.this, Settings.class);
+            startActivity(intent);
         });
 
 
