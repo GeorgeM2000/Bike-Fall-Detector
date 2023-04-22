@@ -112,3 +112,6 @@
 
 <h1> Στοιχεία </h1>
 Κώδικας για ανίχνευση πτώσεων και ατυχημάτων για την πλακέτα Arduino Nano 33 BLE Sense: https://github.com/GeorgeM2000/Arduino/blob/main/Bike_Fall_Detector/Bike_Fall_Detector.ino
+
+Η παρουσίαση είναι στον παρακάτω σύνδεσμο
+https://docs.google.com/presentation/d/1LVrbpPeBbXzDYNB-ZveCeSEmSfoBbXK239u4MUOUNo0/edit?usp=sharing
