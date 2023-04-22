@@ -57,7 +57,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
     private SharedPreferences settingsPreferences;
     private Boolean detectionMethod;
     private static final int coordinatesStackSize = 20;
-    private final Stack<Double[]> coordinatesStack = new FixedStack<>(coordinatesStackSize);
+    protected static final Stack<Double[]> coordinatesStack = new FixedStack<>(coordinatesStackSize);
 
 
     @SuppressLint("SetTextI18n")
@@ -171,8 +171,8 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         });
     }
 
-    private ArrayList<com.example.bikefalldetection.Contact> loadContacts() {
-        contactPreferences = getApplicationContext().getSharedPreferences("Contact_Preferences", Context.MODE_PRIVATE);
+    private ArrayList<Contact> loadContacts() {
+        contactPreferences = getApplicationContext().getSharedPreferences("Contact_Preferences", Context.MODE_PRIVATE);;
 
         Gson gson = new Gson();
 
@@ -218,7 +218,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
                 });
     }
 
-    private  void sendHelpMessage() {
+    private void sendHelpMessage() {
         SmsManager smsManager = SmsManager.getDefault();
 
         // Set the message and the google map address

@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -22,12 +21,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.welie.blessed.BluetoothBytesParser;
@@ -41,8 +34,8 @@ import com.welie.blessed.HciStatus;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
 import java.util.UUID;
 
 public class BikeFallDetectorService extends Service {
@@ -53,8 +46,9 @@ public class BikeFallDetectorService extends Service {
     //private final Context context;
     private final Handler handler = new Handler(Looper.getMainLooper());
     //private int currentTimeCounter = 0;
-    private FusedLocationProviderClient fusedLocationClient;
     SharedPreferences contactPreferences;
+    private static final int coordinatesStackSize = 20;
+    private Stack<Double[]> coordinatesStack = new FixedStack<>(coordinatesStackSize);
 
 
     private final BluetoothPeripheralCallback peripheralCallback = new BluetoothPeripheralCallback() {
@@ -81,7 +75,9 @@ public class BikeFallDetectorService extends Service {
 
                 int flags = parser.getIntValue(0x11);
                 if (flags == 1) {
+
                     // Send message
+                    coordinatesStack = ControlDetection.coordinatesStack;
                     sendHelpMessage();
                 }
             }
@@ -184,39 +180,25 @@ public class BikeFallDetectorService extends Service {
 
         startForeground(1, notification);
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         central = new BluetoothCentralManager(getApplicationContext(), bluetoothCentralManagerCallback, handler);
         startScan();
         return super.onStartCommand(intent, flags, startId);
     }
 
     private void sendHelpMessage() {
-
-        // No need to check for permissions
-        @SuppressLint("MissingPermission") Task<Location> locationTask = fusedLocationClient.getLastLocation();
-
         SmsManager smsManager = SmsManager.getDefault();
-        locationTask.addOnSuccessListener(location -> {
-            double latitude, longitude;
 
-            // Get user latitude and longitude
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
+        // Set the message and the google map address
+        String message = "Βοήθεια! Συνέβει ατύχημα σε αυτή την τοποθεσία : " + coordinatesStack.get(coordinatesStack.size() - 1)[0] + " " + coordinatesStack.get(coordinatesStack.size() - 1)[1];
+        String googleMapsAddress = "https://www.google.com/maps/search/?api=1&query=" + coordinatesStack.get(coordinatesStack.size() - 1)[0] + "%2C" + coordinatesStack.get(coordinatesStack.size() - 1)[1];
 
-            // Set the message and the google map address
-            String message = "Βοήθεια! Συνέβει ατύχημα σε αυτή την τοποθεσία : " + latitude + " " + longitude;
-            String googleMapsAddress = "https://www.google.com/maps/search/?api=1&query=" + latitude + "%2C" + longitude;
+        // Load contacts.
+        ArrayList<Contact> contacts = loadContacts();
 
-            // Load the contacts
-            ArrayList<Contact> contacts = loadContacts();
-
-            // Send a message to each contact
-            for(Contact contact: contacts) {
-                smsManager.sendTextMessage(contact.getPhone(), null, message, null, null);
-                smsManager.sendTextMessage(contact.getPhone(), null, googleMapsAddress, null, null);
-            }
-
-        });
+        for (com.example.bikefalldetection.Contact contact : Objects.requireNonNull(contacts)) {
+            smsManager.sendTextMessage(contact.getPhone(), null, message, null, null);
+            smsManager.sendTextMessage(contact.getPhone(), null, googleMapsAddress, null, null);
+        }
     }
 
     @Nullable
