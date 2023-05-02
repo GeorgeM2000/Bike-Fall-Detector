@@ -96,15 +96,24 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         // When the user clicks the start service icon button
         start_service.setOnClickListener(view -> {
 
-            // Check for permissions.
-            //ActivityCompat.requestPermissions(ControlDetection.this, permissions, 4);
-
             // Get the settings value.
             settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             detectionMethod = settingsPreferences.getBoolean("mobile_phone_detection", false);
 
             // If the user has chosen to disable the "mobile phone detection" function...
             if (!detectionMethod) {
+
+                // Check for permissions.
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.VIBRATE) != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Check Permissions.", Toast.LENGTH_SHORT).show();
+                }
+
                 // Start the service.
                 startBLEService();
 
@@ -113,6 +122,16 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
             }
             // If the user has chosen to enable the "mobile phone detection" function...
             else {
+
+                // Check for permissions.
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this, Manifest.permission.VIBRATE) != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Check Permissions.", Toast.LENGTH_SHORT).show();
+                }
+
                 // Start listening to accelerometer values.
                 sensorManager.registerListener(ControlDetection.this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
             }
@@ -172,7 +191,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
     }
 
     private ArrayList<Contact> loadContacts() {
-        contactPreferences = getApplicationContext().getSharedPreferences("Contact_Preferences", Context.MODE_PRIVATE);;
+        contactPreferences = getApplicationContext().getSharedPreferences("Contact_Preferences", Context.MODE_PRIVATE);
 
         Gson gson = new Gson();
 
@@ -337,7 +356,7 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
             }
         } else {
             // If the linear acceleration variable(alim) exceeds a threshold.
-            if(sensorEvent.values[0] > 5.0) {
+            if(Math.abs(sensorEvent.values[0]) > 5.0) {
 
                 // Start timer
                 if(countDownTimer == null) {
