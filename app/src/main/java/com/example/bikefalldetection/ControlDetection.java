@@ -1,6 +1,5 @@
 package com.example.bikefalldetection;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.preference.PreferenceManager;
@@ -112,13 +111,13 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
                         ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED &&
                         ActivityCompat.checkSelfPermission(this, Manifest.permission.VIBRATE) != PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Check Permissions.", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Start the service.
+                    startBLEService();
+
+                    // Start listening to accelerometer values.
+                    sensorManager.registerListener(ControlDetection.this, linearAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
                 }
-
-                // Start the service.
-                startBLEService();
-
-                // Start listening to accelerometer values.
-                sensorManager.registerListener(ControlDetection.this, linearAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
             }
             // If the user has chosen to enable the "mobile phone detection" function...
             else {
@@ -130,10 +129,11 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
                         ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED &&
                         ActivityCompat.checkSelfPermission(this, Manifest.permission.VIBRATE) != PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Check Permissions.", Toast.LENGTH_SHORT).show();
-                }
+                } else {
 
-                // Start listening to accelerometer values.
-                sensorManager.registerListener(ControlDetection.this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+                    // Start listening to accelerometer values.
+                    sensorManager.registerListener(ControlDetection.this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+                }
             }
 
             Toast.makeText(this, "Service has started", Toast.LENGTH_SHORT).show();
@@ -255,17 +255,8 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
 
     private void storeUsersCoordinates() {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        Task<Location> locationTask = fusedLocationClient.getLastLocation();
+        // No need to check for permissions. We check for permissions when the user clicks the "start service" button.
+        @SuppressLint("MissingPermission") Task<Location> locationTask = fusedLocationClient.getLastLocation();
 
         locationTask.addOnSuccessListener(location -> coordinatesStack.push(new Double[]{location.getLatitude(), location.getLongitude()}));
     }
@@ -282,13 +273,6 @@ public class ControlDetection extends AppCompatActivity implements SensorEventLi
         stopService(intent);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantsResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantsResults);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Check Permissions.", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     @SuppressLint("SetTextI18n")
     @Override
