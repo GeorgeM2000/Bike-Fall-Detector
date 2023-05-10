@@ -23,10 +23,12 @@
 <h3>Τι εργαλεία χρησιμοποιήθηκαν</h3>
 Η εφαρμογή έχει υλοποιηθεί για την πλατφόρμα Android χρησιμοποιώντας τη γλώσσα προγραμματισμού Java και τη γλώσσα σήμανσης XML. H Java χρησιμοποιήθηκε για τη λογική της εφαρμογής ενώ η XML για την σχεδίαση της διεπαφής χρήστη. Επίσης, χρησιμοποιήθηκε σαν βάση δεδομένων η Firebase της Google, η οποία είναι εύχρηστη και συνδέεται πολύ εύκολα με οποιαδήποτε Android εφαρμογή. Στην βάση δεδομένων αποθηκεύονται πληροφορίες χρηστών, όπως οι επαφές στις οποίες θα σταλθούν οι ειδοποιήσεις(SMS) εάν συμβεί ένα ατύχημα, και τα στοιχεία λογαριασμού χρήστη.
 
-Ένα ατύχημα ανιχνεύεται χρησιμοποιώντας την πλακέτα Arduino Nano 33 BLE(Bluetooth Low Energy) Sense τοποθετημένη επάνω σε ένα shield συνδεόμενη με μία μπαταρία 9V. Επίσης, ένα ατύχημα η μία πτώση μπορεί να ανιχνευθεί χρησιμοποιώντας αισθητήρες οι οποίοι ήδη υπάρχουν στις κινητές μας συσκευές(smartphones).
+Ένα ατύχημα ανιχνεύεται χρησιμοποιώντας την πλακέτα Arduino Nano 33 BLE(Bluetooth Low Energy) Sense τοποθετημένη επάνω σε ένα shield συνδεόμενη με μία μπαταρία 9V. Έπειτα, η πλακέτα τοποθετήται στο ποδήλατο η στην μηχανή. Επίσης, ένα ατύχημα η μία πτώση μπορεί να ανιχνευθεί χρησιμοποιώντας αισθητήρες οι οποίοι ήδη υπάρχουν στις κινητές μας συσκευές(smartphones).
 
 <img src="https://drive.google.com/uc?id=1Ci5SUzHxW-uHdfvAojjIX6mlpYSU8qWH" alt="" width="543" height="250" title="Arduino Nano 33 ble Sense">                                                                                         
 <img src="https://drive.google.com/uc?id=10O5-KpwNs_aifo53T_lEOUztyEHoAKPx" alt="" width="543" height="543" title="Arduino Nano 33 ble Sense Shield">
+
+<img src="https://drive.google.com/uc?id=1ArF0rJWg-fZNTvNhy5v3G_H1d1Rkczvz" alt="" width="543" height="500" title="Arduino Nano 33 ble Sense Shield">
 
 <h3>Arduino Nano 33 BLE Sense</h3>
 Το Arduino Nano 33 BLE είναι μια εξέλιξη του παραδοσιακού Arduino Nano, αλλά διαθέτει πολύ πιο ισχυρό επεξεργαστή. Αυτό μας δίνει την δυνατότητα να δημιουργήσουμε μεγαλύτερα προγράμματα από ό,τι με το Arduino Uno και με πολύ περισσότερες μεταβλητές. Ο κύριος επεξεργαστής περιλαμβάνει άλλες εκπληκτικές δυνατότητες όπως Bluetooth ζευγαρώνοντας μέσω NFC και εξαιρετικά χαμηλής κατανάλωσης. Το Nano 33 BLE διαθέτει μονάδα αδρανειακής (inertial) μέτρησης 9 αξόνων (IMU) που σημαίνει ότι περιλαμβάνει επιταχυνσιόμετρο, γυροσκόπιο και μαγνητόμετρο με ανάλυση 3 αξόνων το καθένα.
@@ -95,11 +97,23 @@
 <img src="https://drive.google.com/uc?id=1QLjEyCzhb6ZyhpUyddMYDiQGazYu8aW6" alt="" width="180" height="350" title="ControlDetection">
 
 
-<p style="margin-bottom: 15px;">Όταν ανιχνεύθει μία πτώση η ένα ατύχημα ο χρονομετρητής θα έχει την παρακάτω μορφή.</p>
+<p style="margin-bottom: 15px;">Στην περίπτωση που ο χρήστης επιλέξει να ανιχνεύονται τα ατυχήματα από την πλακέτα Arduino, όταν ανιχνεύθει μία πτώση η ένα ατύχημα, το πράσινο LED θα ανάψει.</p>
+<img src="https://drive.google.com/uc?id=1LE1H5IoXv-jcEl7uunhfvK5GSeHQIqNy" alt="" width="500" height="500" title="Timer">
+
+
+<p style="margin-bottom: 15px;">Αν στη συνέχεια θελήσει να ακυρώσει την ειδοποίηση, μπορεί να κουνήσει το χέρι πάνω από την πλακέτα η να τοποθετήσει το ποδήλατο η τη μηχανή σε μία κατάσταση ισοοροποίας. Έτσι, το κόκκινο LED θα ανάψει.</p>
+<img src="https://drive.google.com/uc?id=1KBVjd09U5Bqq4_hNPpRoB4EyXFT2tI2C" alt="" width="500" height="500" title="Timer">
+
+
+<p style="margin-bottom: 15px;">Αν περάσουν 30 δευτερόλεπτα από την ανίχνευση, τότε θα σταλεί ένα BLE σήμα και θα ανάψει το μπλε LED.</p>
+<img src="https://drive.google.com/uc?id=1-fbFflqycFOZ3Z6PupzZbtY-3lE9-dff" alt="" width="500" height="500" title="Timer">
+
+
+<p style="margin-bottom: 15px;">Στην περίπτωση που ο χρήστης επιλέξει να ανιχνεύονται τα ατυχήματα από την κινητή συσκευή, όταν ανιχνεύθει μία πτώση η ένα ατύχημα ο χρονομετρητής θα έχει την παρακάτω μορφή.</p>
 <img src="https://drive.google.com/uc?id=1PGoCHbNPFL9qkJs4ICYB0gHMZi86ZeFz" alt="" width="180" height="350" title="Timer">
 
 
-<p style="margin-bottom: 15px;">Το μήνυμα βοήθειας θα έχει την παρακάτω μορφή.</p>
+<p style="margin-bottom: 15px;">Το μήνυμα βοήθειας θα έχει την παρακάτω μορφή και στην ανίχνευση με το Arduino, και με την κινητή συσκευή.</p>
 <img src="https://drive.google.com/uc?id=1e5eWQpf7-wZNmZCusSmmst9QNteuI7LB" alt="" width="180" height="350" title="SMS">
 
 
