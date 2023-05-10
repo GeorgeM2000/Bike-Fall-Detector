@@ -68,7 +68,6 @@
 <p style="margin-bottom: 15px;">Για να προστεθούν επαφές πρέπει να συμπληρωθεί το όνομα της επαφής και ο αριθμός κινητού τηλεφώνου.</p>
 <img src="https://drive.google.com/uc?id=1i_YQtj7siBZYWxrEKc7PgNVcPrs-cDrA" alt="" width="180" height="350" title="AddContact">
 
-
 <p style="margin-bottom: 15px;">Αφού προστεθούν οι επαφές, η κύρια "σελίδα" θα έχει την παρακάτω μορφή.</p>
 <img src="https://drive.google.com/uc?id=1kLVVz8FF50WDsW3COrInWg9NHYKvZMKQ" alt="" width="180" height="350" title="Contacts">
 
@@ -98,15 +97,15 @@
 
 
 <p style="margin-bottom: 15px;">Στην περίπτωση που ο χρήστης επιλέξει να ανιχνεύονται τα ατυχήματα από την πλακέτα Arduino, όταν ανιχνεύθει μία πτώση η ένα ατύχημα, το πράσινο LED θα ανάψει.</p>
-<img src="https://drive.google.com/uc?id=1LE1H5IoXv-jcEl7uunhfvK5GSeHQIqNy" alt="" width="500" height="500" title="Timer">
+<img src="https://drive.google.com/uc?id=1LE1H5IoXv-jcEl7uunhfvK5GSeHQIqNy" alt="" width="500" height="500" title="ArduinoBicycle">
 
 
 <p style="margin-bottom: 15px;">Αν στη συνέχεια θελήσει να ακυρώσει την ειδοποίηση, μπορεί να κουνήσει το χέρι πάνω από την πλακέτα η να τοποθετήσει το ποδήλατο η τη μηχανή σε μία κατάσταση ισοοροποίας. Έτσι, το κόκκινο LED θα ανάψει.</p>
-<img src="https://drive.google.com/uc?id=1KBVjd09U5Bqq4_hNPpRoB4EyXFT2tI2C" alt="" width="500" height="500" title="Timer">
+<img src="https://drive.google.com/uc?id=1KBVjd09U5Bqq4_hNPpRoB4EyXFT2tI2C" alt="" width="500" height="500" title="ArduinoBicycleRed">
 
 
 <p style="margin-bottom: 15px;">Αν περάσουν 30 δευτερόλεπτα από την ανίχνευση, τότε θα σταλεί ένα BLE σήμα και θα ανάψει το μπλε LED.</p>
-<img src="https://drive.google.com/uc?id=1-fbFflqycFOZ3Z6PupzZbtY-3lE9-dff" alt="" width="500" height="500" title="Timer">
+<img src="https://drive.google.com/uc?id=1-fbFflqycFOZ3Z6PupzZbtY-3lE9-dff" alt="" width="500" height="500" title="ArduinoBicycleBlue">
 
 
 <p style="margin-bottom: 15px;">Στην περίπτωση που ο χρήστης επιλέξει να ανιχνεύονται τα ατυχήματα από την κινητή συσκευή, όταν ανιχνεύθει μία πτώση η ένα ατύχημα ο χρονομετρητής θα έχει την παρακάτω μορφή.</p>
@@ -129,3 +128,8 @@
 
 Η παρουσίαση είναι στον παρακάτω σύνδεσμο
 https://docs.google.com/presentation/d/1LVrbpPeBbXzDYNB-ZveCeSEmSfoBbXK239u4MUOUNo0/edit?usp=sharing
+
+Σε περίπτωση που δεν εμφανίζονται οι εικόνες, μπορείτε να τις δείτε από εδώ 
+https://drive.google.com/drive/folders/1zTMa-_Fk8uf72OeIzPYscJI8u81itaHd?usp=share_link
+
+
